@@ -1,6 +1,6 @@
 # Azure Active Directory - Authorization of third-party access to API
 
-The code in this repo is meant to describe a scenario where we want to allow an entity to access an Azure Active Directory protected API on behalf of one or multiple other entities.
+The code in this repo is meant to describe a scenario where we want to allow an identity to access an Azure Active Directory protected API on behalf of one or multiple other identities.
 
 The problem and the proposed solution are detailed in this documentation. The repository includes code both in Java and C# (.NET core) implementing the scenario.
 
@@ -24,7 +24,7 @@ Bearer token
 
 We can use the `roles` claim in the token to authorize access to a particular API method. Roles are meant to be generic though, so it might not be enough to check this claim as we may be building a multi-tenant system in which we need to protect information from leaking. An additional check might be required to verify the requester ID has access to the resources retrieved by the API call.
 
-This is a standard practice in OAUTH flows in which that determination is done at the resource level: for instance, I can grab a token for an email service providing me with `Mailbox.Read` access, but the actual determination that I have access to my mailbox and not someone else's mailbox is done by the email service and not something that is included in the token itself.
+This is a standard practice in OAUTH flows in which that determination is done at the resource level: for instance, I can grab a token for an email service providing me with `Mailbox.Read` access, but the actual determination that I have access to my mailbox and not someone else's mailbox is done by the email service rather than something that is included in the token itself.
 
 ### Example: using requester ID as the resource identifier
 
@@ -34,7 +34,7 @@ This API call is meant to list Files that belong to a particular entity in a mul
 GET https://<base_url>/api/v1/Files
 ```
 
-This is a safe implementation however it lacks flexibility. In this case we don't need to do any additional checks because the identity included in the token is our data filter. Howeverm, there are some scenarios where we might want to specify the resources on the request itself.
+This is a safe implementation however it lacks flexibility. In this case we don't need to do any additional checks because the identity included in the token is our data filter. However, there are some scenarios where we might want to specify the resources on the request itself.
 
 ### Example: authorizing requester ID access to resources
 
@@ -48,7 +48,7 @@ Typical scenarios where this is useful would be:
 - an `admin application` that wants to retrieve files from another entity as part of an automated process
 - any other scenario where we want to allow a particular identity to access data from multiple entities.
 
-The problem here is that the token presented has no connection to the resources being accessed. That means that the API needs to do some additional work to validate this request and make sure it's not trying to retrieve unauthorized resources from a different client entity.
+The problem here is that the token presented has no connection to the resources being accessed. That means that the API needs to do some additional work to validate this request and make sure it's not trying to retrieve unauthorized resources from a different customer.
 
 < add some diagram >
 
@@ -56,7 +56,7 @@ The `admin` scenario can be easily solved by using a specific role (like `sys_ad
 
 ### The problem: the aggregator scenario
 
-In more advanced scenarios, we may want to have client entities that act on behalf of other clients. A typical example is an aggregator entity that interacts with our system on behalf of several other clients: these clients can access their data directly, but they can also delegate some operations to the aggregator.
+In more advanced scenarios, we may want to have client identities that act on behalf of other identities. A typical example is an aggregator entity that interacts with our system on behalf of several other clients: these clients can access their data directly, but they can also delegate some operations to the aggregator.
 
 Currently, there is no clean way of doing this in Azure Active Directory as there aren't any claims in app access tokens that can be used to represent this aggregator-client relationship.
 
@@ -64,7 +64,7 @@ Currently, there is no clean way of doing this in Azure Active Directory as ther
 
 The typical solution for this problem is to keep a system-managed ledger of authorizations: some table that connects requester IDs to resources. And we would additionally have to build some process to update that table when clients authorize/deny aggregators to act on their behalf.
 
-This means that we now have two different places to manage authorization: the Azure Active Directory app registrations and our internal ledger which will add complexity and potential security issues to our system.
+This means that we would now have two different places to manage authorization: the Azure Active Directory app registrations and our permissions database which will add complexity and potential security issues to our system.
 
 ## Solution
 
@@ -72,7 +72,35 @@ Some requirements we want to meet with the proposed solution:
 
 - All permission management is done in Azure Active Directory
 - Permissions are granular - aggregator is given access to specific client permissions
-- Identities are kept specific - both aggregators and clients have their own identity
+- Identities are kept specific - both aggregators and clients have their own identity, and we want to be able to track if a request is done by a client to access their own data, or by an aggregator acting on behalf of the client
 - API can be protected by standard token security checks
 
+To achieve this we propose that the *aggregator* scenario is implemented using a two-token system:
 
+< add some diagram >
+
+In this system, the aggregator requests a token from Azure AD that will grant access to his identity over the protected API.
+
+In order to access customer's data, the request must provide a second token in a custom HTTP Header. This seconday token grants access to the aggregator ID over the customer's data and includes its own set of roles that allow for granular permission setting.
+
+Both tokens are generated by Azure AD by specifying a different scope on the token request: the standard authorization token targets the protected API's ID, the secondary token targets the customer ID.
+
+Here's a side by side comparison of the two tokens:
+
+< add picture >
+
+Naturally, this requires a more complex token validation process, which is depicted in the following diagram:
+
+## Configuring Azure AD
+
+To support the two-token system, we need to have the appropriate configurations in place on Azure AD.
+
+< add app registration details>
+
+## Configuring the Sample
+
+< Explain configuration settings >
+
+## Running the Sample
+
+< Add sample instructions >
