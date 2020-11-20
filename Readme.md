@@ -1,8 +1,8 @@
 # Azure Active Directory - Authorization of third-party access to API
 
-The code in this repo is meant to describe a scenario where we want to allow an entity to access an Azure Active Directory protected API on behalf of multiple other entities - the aggregator scenario.
+The code in this repo is meant to describe a scenario where we want to allow an entity to access an Azure Active Directory protected API on behalf of one or multiple other entities.
 
-The problem and the proposed solution are detailed in this documentation. The repository includes code both in Java and C# (.NET core) implementing the scenario and the proposed solution.
+The problem and the proposed solution are detailed in this documentation. The repository includes code both in Java and C# (.NET core) implementing the scenario.
 
 ## Introduction
 
@@ -24,25 +24,29 @@ Bearer token
 
 We can use the `roles` claim in the token to authorize access to a particular API method. Roles are meant to be generic though, so it might not be enough to check this claim as we may be building a multi-tenant system in which we need to protect information from leaking. An additional check might be required to verify the requester ID has access to the resources retrieved by the API call.
 
+This is a standard practice in OAUTH flows in which that determination is done at the resource level: for instance, I can grab a token for an email service providing me with `Mailbox.Read` access, but the actual determination that I have access to my mailbox and not someone else's mailbox is done by the email service and not something that is included in the token itself.
+
 ### Example: using requester ID as the resource identifier
 
-This API call is meant to list Files that belong to a particular entity in a multi-tenant environemnt. In this REST API, we use the `app_id` as the resource identifier, meaning that we will only ever retrieve files owned by that entity.
+This API call is meant to list Files that belong to a particular entity in a multi-tenant environment. In this REST API, we use the `app_id` as the resource identifier, meaning that we will only ever retrieve files owned by that entity.
 
 ```bash
-<some url>
+GET https://<base_url>/api/v1/Files
 ```
 
-This is a safe implementation however it lacks flexibility. There are some scenarios where we might want to specify the resources on the request itself.
+This is a safe implementation however it lacks flexibility. In this case we don't need to do any additional checks because the identity included in the token is our data filter. Howeverm, there are some scenarios where we might want to specify the resources on the request itself.
 
 ### Example: authorizing requester ID access to resources
 
 This is a modified version of the previous API where we specify an ID in the request, to filter the files that are retrieved.
 
 ```bash
-<some url>
+GET https://<base_url>/api/v1/{customerId}/Files
 ```
 
-A typical scenario where this is useful would be a `admin application` that wants to retrieve files from a client entity as part of an automated process.
+Typical scenarios where this is useful would be:
+- an `admin application` that wants to retrieve files from another entity as part of an automated process
+- any other scenario where we want to allow a particular identity to access data from multiple entities.
 
 The problem here is that the token presented has no connection to the resources being accessed. That means that the API needs to do some additional work to validate this request and make sure it's not trying to retrieve unauthorized resources from a different client entity.
 
@@ -52,7 +56,7 @@ The `admin` scenario can be easily solved by using a specific role (like `sys_ad
 
 ### The problem: the aggregator scenario
 
-In more advanced scenarios, we may want to have client entities that act on behalf of other clients. A typical example is an aggregator entity that interacts with our system on behaful of several other clients: these clients can access their data directly, but they can also delegate some operations to the aggregator.
+In more advanced scenarios, we may want to have client entities that act on behalf of other clients. A typical example is an aggregator entity that interacts with our system on behalf of several other clients: these clients can access their data directly, but they can also delegate some operations to the aggregator.
 
 Currently, there is no clean way of doing this in Azure Active Directory as there aren't any claims in app access tokens that can be used to represent this aggregator-client relationship.
 
