@@ -12,17 +12,19 @@ In a typical example, we use the OAUTH client credentials grant flow to authoriz
 
 TBD: add diagram
 
-The requesting application requests an access token from Azure AD to access the protected API. The generated token is a JWT (Json Web Token) including the following claims:
+Using Azure AD, both the API and the client application need to have a corresponding app registration, and the client app needs to have a set of permissions (roles) over the API.
 
-TBD: add table
+The requesting application requests an access token from Azure AD to access the protected API. The generated token is a JWT (Json Web Token) including a set of claims that include the following:
 
-That token is then passed on the Authorization header of any HTTP requests to the protected API:
+- `aud` - specifying the audience for this token, tipically the App URI for the API in Azure AD
+- `appid` - the client ID for the client application registration in Azure AD
+- `roles` - the set of roles granted to the calling application, as defined in the API permissions section in Azure AD.
 
-```bash
-Bearer token
-```
+We can use the `aud` claim to ensure the token is meant for our protected API.
 
-We can use the `roles` claim in the token to authorize access to a particular API method. Roles are meant to be generic though, so it might not be enough to check this claim as we may be building a multi-tenant system in which we need to protect information from leaking. An additional check might be required to verify the requester ID has access to the resources retrieved by the API call.
+We can use the `roles` claim in the token to authorize access to a particular API method. Roles are meant to be generic though, so it might not be enough to check this claim as we may be building a multi-tenant system in which we need to protect information from leaking.
+
+An additional check might be required to verify the `appid` matches an identity that has access to the resources retrieved by the API call. 
 
 This is a standard practice in OAUTH flows in which that determination is done at the resource level: for instance, I can grab a token for an email service providing me with `Mailbox.Read` access, but the actual determination that I have access to my mailbox and not someone else's mailbox is done by the email service rather than something that is included in the token itself.
 
@@ -44,15 +46,11 @@ This is a modified version of the previous API where we specify an ID in the req
 GET https://<base_url>/api/v1/{customerId}/Files
 ```
 
-Typical scenarios where this is useful would be:
-- an `admin application` that wants to retrieve files from another entity as part of an automated process
-- any other scenario where we want to allow a particular identity to access data from multiple entities.
+This type of API is useful in any scenario where we want to allow a particular identity to access data from other entities.
 
-The problem here is that the token presented has no connection to the resources being accessed. That means that the API needs to do some additional work to validate this request and make sure it's not trying to retrieve unauthorized resources from a different customer.
+The problem here is that the token presented has no connection to the resources being accessed. That means that the API needs to do some additional work to validate this request and make sure the calling application is not trying to retrieve unauthorized resources from a different customer.
 
 < add some diagram >
-
-The `admin` scenario can be easily solved by using a specific role (like `sys_admin`) that would grant access to all resources and is only assigned to the `admin application` - but this won't be an option in other scenarios.
 
 ### The problem: the aggregator scenario
 
@@ -60,9 +58,9 @@ In more advanced scenarios, we may want to have client identities that act on be
 
 Currently, there is no clean way of doing this in Azure Active Directory as there aren't any claims in app access tokens that can be used to represent this aggregator-client relationship.
 
-< add some diagram >
-
 The typical solution for this problem is to keep a system-managed ledger of authorizations: some table that connects requester IDs to resources. And we would additionally have to build some process to update that table when clients authorize/deny aggregators to act on their behalf.
+
+< add diagram >
 
 This means that we would now have two different places to manage authorization: the Azure Active Directory app registrations and our permissions database which will add complexity and potential security issues to our system.
 
@@ -90,6 +88,8 @@ Here's a side by side comparison of the two tokens:
 < add picture >
 
 Naturally, this requires a more complex token validation process, which is depicted in the following diagram:
+
+< add diagram >
 
 ## Configuring Azure AD
 
