@@ -10,7 +10,7 @@ A common pattern for protecting an API with Azure Active Directory is the usage 
 
 In a typical example, we use the OAUTH client credentials grant flow to authorize an application to access an API.
 
-TBD: add diagram
+![oauth flow](content/oauth.jpg)
 
 Using Azure AD, both the API and the client application need to have a corresponding app registration, and the client app needs to have a set of permissions (roles) over the API.
 
