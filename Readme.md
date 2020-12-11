@@ -34,7 +34,7 @@ This is a standard practice in OAUTH flows in which that determination is done a
 
 ### Example: using requester ID as the resource identifier
 
-This API call is meant to list Files that belong to a particular entity in a multi-tenant environment. In this REST API, we use the `app_id` as the resource identifier, meaning that we will only ever retrieve files owned by that entity.
+This API call is meant to list Files that belong to a particular entity in a multi-tenant environment. In this REST API, we use the `appid` contained in the token as the resource identifier, meaning that we will only ever retrieve files owned by that entity.
 
 ```bash
 GET https://<base_url>/api/v1/Files
