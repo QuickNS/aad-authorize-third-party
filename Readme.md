@@ -77,7 +77,7 @@ Some requirements we want to meet with the proposed solution:
 
 To achieve this we propose that the *aggregator* scenario is implemented using a two-token system:
 
-< add some diagram >
+![aggregator oauth](content/aggregatorDiagram.jpg)
 
 In this system, the aggregator requests a token from Azure AD that will grant access to his identity over the protected API.
 
