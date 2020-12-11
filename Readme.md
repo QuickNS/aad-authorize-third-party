@@ -22,11 +22,13 @@ The requesting application requests an access token from Azure AD to access the 
 
 > Note: the claim names will vary depending on OAuth version. This is for v1, however, corresponding claims exist on v2 tokens.
 
-We can use the `aud` claim to ensure the token is meant for our protected API.
+In a simple token validation mechanism we can use these claims to check the following rules:
 
-We can use the `roles` claim in the token to authorize access to a particular API method. Roles are meant to be generic though, so it might not be enough to check this claim as we may be building a multi-tenant system in which we need to protect information from leaking.
+- We can use the `aud` claim to ensure the token is meant for our protected API.
 
-An additional check might be required to verify the `appid` matches an identity that has access to the resources retrieved by the API call. 
+- We can use the `roles` claim in the token to authorize access to a particular API method. Roles are meant to be generic though, so it might not be enough to check this claim as we may be building a multi-tenant system in which we need to protect information from leaking.
+
+- An additional check might be required to verify the `appid` matches an identity that has access to the resources retrieved by the API call. 
 
 This is a standard practice in OAUTH flows in which that determination is done at the resource level: for instance, I can grab a token for an email service providing me with `Mailbox.Read` access, but the actual determination that I have access to my mailbox and not someone else's mailbox is done by the email service rather than something that is included in the token itself.
 
