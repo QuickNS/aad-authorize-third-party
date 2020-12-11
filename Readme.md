@@ -20,6 +20,8 @@ The requesting application requests an access token from Azure AD to access the 
 - `appid` - the client ID for the client application registration in Azure AD
 - `roles` - the set of roles granted to the calling application, as defined in the API permissions section in Azure AD.
 
+> Note: the claim names will vary depending on OAuth version. This is for v1, however, corresponding claims exist on v2 tokens.
+
 We can use the `aud` claim to ensure the token is meant for our protected API.
 
 We can use the `roles` claim in the token to authorize access to a particular API method. Roles are meant to be generic though, so it might not be enough to check this claim as we may be building a multi-tenant system in which we need to protect information from leaking.
@@ -48,9 +50,7 @@ GET https://<base_url>/api/v1/{customerId}/Files
 
 This type of API is useful in any scenario where we want to allow a particular identity to access data from other entities.
 
-The problem here is that the token presented has no connection to the resources being accessed. That means that the API needs to do some additional work to validate this request and make sure the calling application is not trying to retrieve unauthorized resources from a different customer.
-
-< add some diagram >
+The problem here is that the token presented might have no direct connection to the resources being accessed. That means that the API needs to do some additional work to validate this request and make sure the calling application is not trying to retrieve unauthorized resources from a different customer.
 
 ### The problem: the aggregator scenario
 
@@ -60,7 +60,7 @@ Currently, there is no clean way of doing this in Azure Active Directory as ther
 
 The typical solution for this problem is to keep a system-managed ledger of authorizations: some table that connects requester IDs to resources. And we would additionally have to build some process to update that table when clients authorize/deny aggregators to act on their behalf.
 
-< add diagram >
+![token validation](content/tokenValidation.jpg)
 
 This means that we would now have two different places to manage authorization: the Azure Active Directory app registrations and our permissions database which will add complexity and potential security issues to our system.
 
