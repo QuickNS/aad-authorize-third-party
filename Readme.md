@@ -22,7 +22,7 @@ The requesting application requests an access token from Azure AD to access the 
 
 > Note: the claim names will vary depending on OAuth version. This is for v1, however, corresponding claims exist on v2 tokens.
 
-In a simple token validation mechanism we can use these claims to check the following rules:
+In a simple token validation process we can use these claims to check the following rules:
 
 - We can use the `aud` claim to ensure the token is meant for our protected API.
 
