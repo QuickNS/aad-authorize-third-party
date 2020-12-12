@@ -125,7 +125,7 @@ To access the API, aggregatorX requests a token and includes it in the authoriza
 
 The requests **will not be authorized** because the appid doesn't match the resource ID specified in the URL and the additional token was not provided. Based on the token provided we can only infer that aggregatorX has enough rights to call the API, but we have no indication that is authorized to access customerA data.
 
-### aggreagtorX accesses customerA data supplying two tokens
+### aggregatorX accesses customerA data supplying two tokens
 
 As depicted in the diagram above, aggregatorX will request two tokens: one to access the API and another one to access customerA's data:
 
@@ -157,7 +157,7 @@ Notice how we can apply a different set of permissions at the customer level, in
 
 The following diagram details the entire validation process using the two token approach:
 
-<insert flowchart>
+![flowchart](content/flowchart.jpg)
 
 ## Configuring Azure AD
 
