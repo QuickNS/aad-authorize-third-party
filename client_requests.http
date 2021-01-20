@@ -1,0 +1,58 @@
+# Running the scenario
+
+### Login as clientXYZ
+# @name login_client
+POST https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token HTTP/1.1
+
+grant_type=client_credentials
+&client_id={{clientId}}
+&client_secret={{clientSecret}}
+&scope={{apiScope}}
+
+# Note: you can copy the access_token and decode it in http://jwt.ms to check the claims inside
+
+### Access clientXYZ data using provided token - this should work
+### In this example this is clientXYZ accessing their own data
+GET {{apiUrl}}/api/{{clientId}}/data HTTP/1.1
+Authorization: Bearer {{login_client.response.body.$.access_token}}
+
+### Writing clientXYZ data using provided token - this should work
+### Again, this is clientXYZ accessing their own data
+PUT {{apiUrl}}/api/{{clientId}}/data HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{login_client.response.body.$.access_token}}
+
+### Login as aggregatorABC
+# @name login_aggregator
+POST https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token HTTP/1.1
+
+grant_type=client_credentials
+&client_id={{aggregatorId}}
+&client_secret={{aggregatorSecret}}
+&scope={{apiScope}}
+
+### Access clientXYZ data using aggregatorABC token - this will NOT work
+### aggregatorABC is trying to access clientXYZ data without providing a secondary token
+GET {{apiUrl}}/api/{{clientId}}/data HTTP/1.1
+Authorization: Bearer {{login_aggregator.response.body.$.access_token}}
+
+### Request an additional token - notice we are using a different scope here
+# @name secondary_token
+POST https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token HTTP/1.1
+
+grant_type=client_credentials
+&client_id={{aggregatorId}}
+&client_secret={{aggregatorSecret}}
+&scope={{clientScope}}
+
+### Access clientXYZ data using both aggregatorABC's tokens - this should work
+GET {{apiUrl}}/api/{{clientId}}/data HTTP/1.1
+Authorization: Bearer {{login_aggregator.response.body.$.access_token}}
+X-Secondary-Token: {{secondary_token.response.body.$.access_token}}
+
+### Writing clientXYZ data using both aggregatorABC's tokens - this will NOT work
+### aggregatorABC has been given Read-only access to clientXYZ data
+PUT {{apiUrl}}/api/{{clientId}}/data HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{login_aggregator.response.body.$.access_token}}
+X-Secondary-Token: {{secondary_token.response.body.$.access_token}}
