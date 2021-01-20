@@ -383,3 +383,13 @@ Start the Java/.NET API application so it's running locally, or deploy it to a r
 > Update the `apiUrl` property on the `.vscode/settings.json` file so that the requests are properly routed.
 
 Then simply follow the instructions on the `client_requests.http` file to walkthrough the scenario. The file includes comments to explain what you should be seeing at each step.
+
+If everything is correctly configured we should have the following setup working:
+
+- We can requests tokens from Azure AD by using the `clientXYZ` or `aggregatorABC` identities.
+- Issued tokens include the `API.Read` and `API.Write` roles and are targeted at the `my-protected-api` audience
+- The Java/.NET application is able to validate these tokens and verify the roles within
+- The `aggregatorABC` is able to request a token for the `clientXYZ` scope and send that token in a custom header
+- The Java/.NET application is able to validate the secondary token to determine that `aggregatorABC` has read-only access to `clientXYZ` resources
+
+
