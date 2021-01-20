@@ -316,37 +316,70 @@ This screenshot shows the state of the new client application with permissions t
 
 ![Client App Permissions](./content/aggregator_permissions.png)
 
+## Gathering all configuration values
+
+This is a list of values you need to have noted down:
+
+### `my-protected-api`
+
+On the app registration **Overview** page:
+
+- The **Application (client) ID**
+- The **Directory (tenant) ID**
+- The **Application ID URI**
+
+### `clientXYZ`
+
+On the app registration **Overview** page:
+
+- The **Application (client) ID**
+- The **Application ID URI**
+
+Additionally you need the **Secret** value generated earlier, which can not be retrieved at this point.
+
+### `aggregatorABC`
+
+On the app registration **Overview** page:
+
+- The **Application (client) ID**
+
+Additionally you need the **Secret** value generated earlier, which can not be retrieved at this point.
+
 ## Configuring the Sample
 
-Now that we completed the Azure AD configuration we need to configure both the API application and the client applications to use these identities.
+With the above values collected we can now configure the sample to run and walkthrough the scenario. There is a Java and .NET version of the API on this app which will act as our `my-protected-api` app.
 
-### Configuring the client application's code
+Open either the Java or .NET folder and modify the values in their respective configuration files. You only need the `my-protected-api` values listed above.
 
-There are 4 values that need to be included in the client application code's configuration files.
+The *client* is just a series of HTTP requests defined in the client_requests.http file in this repo. To execute the http requests, we will need the following steps:
 
-On the client application **Overview** page:
+1. Install `humao.rest-client` extension in VSCode
+2. Open the root of the repository in VSCode
+3. Add these settings to your `.vscode/settings.json`. You may need to create the file if it doesn't already exist:
 
-- The **Application (client) ID** for the client app registration
-- The **Directory (tenant) ID** for the client app registration
+    ```json
+    {
+        "rest-client.environmentVariables": {
+            "$shared": {
+                "clientId": "REPLACE_WITH_CLIENT_ID_OF_CLIENTXYZ_APP",
+                "clientSecret": "REPLACE_WITH_CLIENTXYZ_SECRET",
+                "clientScope" : "REPLACE_WITH_CLIENTXYZ_APPLICATION_ID_URI",
+                "aggregatorId": "REPLACE_WITH_CLIENT_ID_OF_AGGREAGTORABC_APP",
+                "aggregatorSecret": "REPLACE_WITH_AGGREGATORABC_SECRET",
+                "tenantId": "REPLACE_WITH_AZURE_AD_TENANT_ID",
+                "apiScope": "api://<API_ID_URI/.default",
+                "apiUrl": "http://localhost:8080"
+            }
+        }
+    }
+    ```
 
-Additionally, as mentioned earlier, you need to supply:
-
-- The **Client Secret** added to the client app registration (recorded earlier and not retrieable at this point)
-- The **Application ID URI** for the API app registration (Overview page of the API app registration)
-
-These values will allow developers to create a configuration file similar to this example:
-
-```properties
-CLIENT_ID=<client_id>
-AUTHORITY=https://login.microsoftonline.com/<directoryId>/
-SECRET=<client_secret>
-SCOPE=api://<api_client_id>/.default
-```
-
-> Note: In this OAUTH flow, applications cannot ask for specific scopes, and must use the `resource/.default` format where `resource` is the Application ID URI created for the Shopchain API application.
-
-Depending on what values you use for CLIENT_ID and SECRET, the application will run as `clientXYZ` or `aggregatorABC`. The remaining configuration properties don't change as we're accessing the same API.
+> Note: In this OAUTH flow, applications cannot ask for specific scopes, and must use the `resource/.default` format where `resource` is the Application ID URI created for the `my-protected-api` application.
 
 ## Running the Sample
 
-< Add sample instructions >
+Start the Java/.NET API application so it's running locally, or deploy it to a running web server.
+
+> Update the `apiUrl` property on the `.vscode/settings.json` file so that the requests are properly routed.
+
+Then simply follow the instructions on the `client_requests.http` file to walkthrough the scenario. The file includes comments to explain what you should be seeing at each step.
