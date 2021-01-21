@@ -262,7 +262,7 @@ In this section we register a client application in Azure AD to represent an API
 
 This screenshot shows the state of a client application with permissions to access the **my-protected-api** application with the **API.Read** and **API.Write** roles:
 
-![Client App Permissions](./content/client_app_permissions.png)
+![Client App Permissions](./content/client_app_permissions.PNG)
 
 ### Enabling third-party access
 
@@ -314,7 +314,7 @@ Don't foget to also create a secret and take a note of the value as that will be
 
 This screenshot shows the state of the new client application with permissions to access the **my-protected-api** and also authorized to access **customerXYZ**'s resources in **read only** mode.
 
-![Client App Permissions](./content/aggregator_permissions.png)
+![Client App Permissions](./content/aggregator_permissions.PNG)
 
 ## Gathering all configuration values
 
