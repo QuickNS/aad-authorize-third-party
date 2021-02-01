@@ -22,6 +22,23 @@ PUT {{apiUrl}}/api/{{clientId}}/data HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{login_client.response.body.$.access_token}}
 
+### Show how the authorization context works in the previous calls
+PUT {{apiUrl}}/api/{{clientId}}/debug HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{login_client.response.body.$.access_token}}
+
+# This debug method returns an AuthContext object which is constructed during token validation
+# You should see the following things:
+# - audience matches the API ID URI
+# - requester ID matches the clientXYZ
+# - requiredRole should be "API.Read" - this is set by the API method
+# - isThirdPartyAccessAttempt is false
+# - roles should be "API.Read" and "API.Write" (so they include the required "API.Read")
+# - requestedClientId is the same as requesterId - so this is clientXYZ accessing their own data
+# - clientRoles is null as no secondary token was provided
+# - apiClientId matches the API client Id
+# - tenantId matches your tenant Id
+
 ### Login as aggregatorABC
 # @name login_aggregator
 POST https://login.microsoftonline.com/{{tenantId}}/oauth2/v2.0/token HTTP/1.1
@@ -56,3 +73,21 @@ PUT {{apiUrl}}/api/{{clientId}}/data HTTP/1.1
 Content-Type: application/json
 Authorization: Bearer {{login_aggregator.response.body.$.access_token}}
 X-Secondary-Token: {{secondary_token.response.body.$.access_token}}
+
+### Show how the authorization context works in the previous calls
+PUT {{apiUrl}}/api/{{clientId}}/debug HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer {{login_aggregator.response.body.$.access_token}}
+X-Secondary-Token: {{secondary_token.response.body.$.access_token}}
+
+# This debug method returns an AuthContext object which is constructed during token validation
+# You should see the following things:
+# - audience matches the API ID URI
+# - requester ID matches the aggregatorABC
+# - requiredRole should be "API.Read" - this is set by the API method
+# - isThirdPartyAccessAttempt is true
+# - roles should be "API.Read" and "API.Write" (so they include the required "API.Read")
+# - requestedClientId is the clientXYZ id - so this is aggregatorABC accessing clientXYZ data
+# - clientRoles includes only clientXYZ.API.Read
+# - apiClientId matches the API client Id
+# - tenantId matches your tenant Id

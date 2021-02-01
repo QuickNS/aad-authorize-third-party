@@ -1,0 +1,10 @@
+azure.activedirectory.session-stateless=true
+azure.activedirectory.client-id=<API_CLIENT_ID>
+azure.activedirectory.appIdUri=<APPLICATION_ID_URI>
+azure.activedirectory.tenant-id=<TENANT_ID>
+authentication.anonymous-access=false
+
+# Required config by latest stable version of active directory library
+# Values not used but still required to prevent errors on startup
+spring.security.oauth2.client.registration.azure.client-id=not-used
+spring.security.oauth2.client.registration.azure.client-secret=not-used
