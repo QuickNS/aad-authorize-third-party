@@ -1,0 +1,16 @@
+{
+  "AzureAd": {
+    "Instance": "https://login.microsoftonline.com/",
+    "ClientId": "<API_CLIENT_ID>",
+    "AppIdUri": "<APPLICATION_ID_URI>",
+    "TenantId": "<TENANT_ID>"
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "AllowedHosts": "*"
+}

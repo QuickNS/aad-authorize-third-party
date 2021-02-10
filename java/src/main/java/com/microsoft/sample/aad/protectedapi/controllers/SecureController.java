@@ -22,7 +22,7 @@ public class SecureController {
     @GetMapping("/{clientId}/data")
     @PreAuthorize("hasPermission(#clientId, 'ClientId', 'API.Read')")
     public String ReadData(@PathVariable String clientId) {
-        return String.format("Request Validates! - %s", clientId);
+        return String.format("Request Validated! - %s", clientId);
     }
 
     @PutMapping("/{clientId}/data")
@@ -31,7 +31,7 @@ public class SecureController {
         return String.format("Request Validated! - %s", clientId);
     }
 
-    @PutMapping("/{clientId}/debug")
+    @GetMapping("/{clientId}/debug")
     public AuthContext Debug(@PathVariable String clientId) {
         // rather than using the PreAuthorize method, we are explicitly calling
         // the tokenValidator's validateTokenForClient method which performs the same operations

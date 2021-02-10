@@ -1,0 +1,15 @@
+{
+    "rest-client.environmentVariables": {
+        "$shared": {
+            "clientId": "b420fa3a-c9a0-4ab1-83ba-8fa2d5203e26",
+            "clientSecret": "zz.8_fAAVT-ck9GuJWL184KTYZ398-qyy_",
+            "clientScope" : "api://b420fa3a-c9a0-4ab1-83ba-8fa2d5203e26/.default",
+            "aggregatorId": "712d3f26-15ae-4470-9790-c4c50478a895",
+            "aggregatorSecret": "T1558lZCjWo-IiZwv1c53wZ.et1--SDO-4",
+            "tenantId": "ab58418e-98c6-4dae-a3e8-a78b4e544d6f",
+            "apiScope": "api://my-protected-api/.default",
+            "apiUrl": "http://localhost:5000"
+        }
+    },
+    "java.configuration.updateBuildConfiguration": "automatic"
+}

@@ -1,6 +1,6 @@
 # Configuring the Java sample
 
-Inside the [src/main/resources](src/main/resources) folder, fine the `application.properties.template`.
+Inside the [src/main/resources](src/main/resources) folder, find the `application.properties.template`.
 
 Make a copy of it and rename it to `application.properties`.
 

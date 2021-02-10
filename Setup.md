@@ -130,7 +130,7 @@ Additionally, we now need to create a `scope` for this client identity so that w
 
 1. In the application registration for your application, select "Expose an API"
 2. Next to the Application ID URI, click Set
-3. By default, the application registration portal recommends that you use the resource URI `api://{app_client_id}`. This URI is unique but not human readable. If you change the URI, make sure the new value is unique. In this example we are using `api://clientXYZ`
+3. By default, the application registration portal recommends that you use the resource URI `api://{app_client_id}`. This URI is unique but not human readable. However, we recommend leaving the default value as it will simplify the code.
 4. Click Save
 
 We also need to define new roles that are client specific. The idea is that, when we give permissions to another identity to access this identity resources, we want to have granular control over the permissions that are added. As such, we will create replicas of the API roles defined before:
@@ -142,22 +142,22 @@ Click the **Manifest** button on the `clientXYZ` app registration and replace th
     {
     "allowedMemberTypes": [ "Application" ],
     "description": "Access clientXYZ data with Read privileges",
-    "displayName": "clientXYZ.Read",
+    "displayName": "clientXYZ.API.Read",
     "id": "7fab3cc5-9f2f-4094-8fdd-1a366c88255b",
     "isEnabled": true,
     "lang": null,
     "origin": "Application",
-    "value": "clientXYZ.Read"
+    "value": "clientXYZ.API.Read"
     },
     {
     "allowedMemberTypes": [ "Application" ],
     "description": "Access clientXYZ data with Write privileges",
-    "displayName": "clientXYZ.Write",
+    "displayName": "clientXYZ.API.Write",
     "id": "5a5f9622-3667-4a00-9ecb-113ea3b788b8",
     "isEnabled": true,
     "lang": null,
     "origin": "Application",
-    "value": "clientXYZ.Write"
+    "value": "clientXYZ.API.Write"
     }
     ],
 ```
