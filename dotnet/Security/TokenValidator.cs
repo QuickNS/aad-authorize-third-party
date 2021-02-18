@@ -23,20 +23,24 @@ namespace dotnet.Security
             authContext.Authorized = false; // we default to rejecting
 
             //validate audience
-            string audience = ctx.User.Claims.FirstOrDefault(c => c.Type == "aud").Value;
+            string audience = ctx.User.Claims.FirstOrDefault(c => c.Type == "aud")?.Value;
+            if (String.IsNullOrEmpty(audience)) {
+                authContext.ForbidReason = $"Authorization token is invalid";
+                return authContext;
+            }
             authContext.Audience = audience;
 
             var expectedAudience = azureAdConfig.AppIdUri;
             if (audience != expectedAudience)
             {
-                authContext.ForbidReason = $"Forbid request: Audience was {audience} - expected {expectedAudience}";
+                authContext.ForbidReason = $"Audience was {audience} - expected {expectedAudience}";
                 return authContext;
             }
 
             // check authorization token has access to this API method
             if (!ctx.User.IsInRole(requiredRole))
             {
-                authContext.ForbidReason = $"Forbid request: Authorization token is missing required role {requiredRole}";
+                authContext.ForbidReason = $"Authorization token is missing required role {requiredRole}";
                 return authContext;
             }
 
@@ -88,7 +92,7 @@ namespace dotnet.Security
                     if (targetClientId != clientId)
                     {
                         // the secondary token is for another client
-                        authContext.ForbidReason = $"Forbid request: Secondary Token is for {targetClientId} - expected {clientId}";
+                        authContext.ForbidReason = $"Secondary Token is for {targetClientId} - expected {clientId}";
                         return authContext;
                     }
 
@@ -108,7 +112,7 @@ namespace dotnet.Security
                     if (!hasClientRole)
                     {
                         // the secondary token is for another client
-                        authContext.ForbidReason = $"Forbid request: {CUSTOM_HEADER} is missing {requiredRole}";
+                        authContext.ForbidReason = $"{CUSTOM_HEADER} is missing {requiredRole}";
                         return authContext;
                     }
 
@@ -117,7 +121,7 @@ namespace dotnet.Security
                 }
                 else //no custom header supplied
                 {
-                    authContext.ForbidReason = $"Forbid request: Provided Authorization token does not grant access to this resource";
+                    authContext.ForbidReason = $"Provided Authorization token does not grant access to this resource";
                     return authContext;
                 }
             }

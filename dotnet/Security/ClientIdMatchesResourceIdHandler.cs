@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json.Linq;
 
 namespace dotnet.Security
 {
@@ -38,10 +39,13 @@ namespace dotnet.Security
             }
             else
             {
-                byte[] bytes = Encoding.UTF8.GetBytes(authContext.ForbidReason);
+                string response = JObject.FromObject(authContext).ToString();
+                //byte[] bytes = Encoding.UTF8.GetBytes("{ \"Unauthorized\": \"" + authContext.ForbidReason + "\"}");
+                byte[] bytes = Encoding.UTF8.GetBytes(response);
                 httpContext.Response.StatusCode = 403;
                 httpContext.Response.ContentType = "application/json";
                 httpContext.Response.Body.WriteAsync(bytes, 0, bytes.Length);
+                httpContext.Response.Body.FlushAsync();
             }
             return Task.CompletedTask;
         }

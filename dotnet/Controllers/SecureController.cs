@@ -36,7 +36,7 @@ namespace dotnet.Controllers
         [Route("/api/{clientId}/data")]
         public IActionResult ReadData(string clientId)
         {
-            return Ok($"Get Request Validated with ReadOnlyResourceAccess Policy - {clientId}");
+            return Ok($"Get Request Validated with ReadOnlyResourceAccess Policy\nShowing data for customer: {clientId}");
         }
 
         [HttpPut]
@@ -44,7 +44,7 @@ namespace dotnet.Controllers
         [Route("/api/{clientId}/data")]
         public IActionResult WriteData(string clientId)
         {
-            return Ok($"Write Request Validated with WriteResourceAccess Policy - {clientId}");
+            return Ok($"Put Request Validated with WriteResourceAccess Policy\nShowing data for customer: {clientId}");
         }
 
         [HttpGet]
